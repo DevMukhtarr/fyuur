@@ -180,29 +180,29 @@ def show_venue(venue_id):
       data["image_link"] = venue_clicked.image_link
       data["past_shows"] = []
       data["upcoming_shows"] = []
-      # data["past_shows_count"] = len(data["past_shows"])
-      # data["upcoming_shows_count"] = len(data["upcoming_shows"])
 
-      for show in shows:
-        # db_show_in_millisecond = show.start_time
-        if show.start_time > datetime.now():
-          upcoming_shows = {
-            "artist_id": show.artist_id,
-            "artist_name": Artist.query.get(show.artist_id).name,
+      # past show quey
+      past_shows_query = db.session.query(Show).join(Venue).filter(Show.venue_id == venue_id).filter(Show.start_time < datetime.now()).all()
+      # upcoming show query
+      upcoming_shows_query = db.session.query(Show).join(Venue).filter(Show.venue_id == venue_id).filter(Show.start_time > datetime.now()).all()
+      for show in upcoming_shows_query:
+        upcoming_shows = {
+            "venue_id": show.artist_id,
+            "venue_name": Venue.query.get(show.venue_id).name,
             "artist_image_link": Artist.query.get(show.artist_id).image_link,
             "start_time": str(show.start_time)
           }
-          data["upcoming_shows"].append(upcoming_shows)
-          data["upcoming_shows_count"] = len(data["upcoming_shows"])
-        else:
-          past_shows = {
-            "artist_id": show.artist_id,
-            "artist_name": Artist.query.get(show.artist_id).name,
+        data["upcoming_shows"].append(upcoming_shows)
+        data["upcoming_shows_count"] = len(data["upcoming_shows"])
+      for show in past_shows_query:
+        past_shows = {
+            "venue_id": show.artist_id,
+            "venue_name": Venue.query.get(show.venue_id).name,
             "artist_image_link": Artist.query.get(show.artist_id).image_link,
             "start_time": str(show.start_time)
           }
-          data["past_shows"].append(past_shows)
-          data["past_shows_count"] = len(data["past_shows"])
+        data["past_shows"].append(past_shows)
+        data["past_shows_count"] = len(data["past_shows"])
           
   except:
     flash("Something went wrong. Please try again.")
@@ -222,33 +222,33 @@ def create_venue_form():
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
-  try:
     form = VenueForm()
-    new_venue = Venue(
-    name=  form.name.data,
-    city= form.city.data,
-    state= form.state.data,
-    address= form.address.data,
-    phone= form.phone.data,
-    genres= form.genres.data,
-    image_link= form.image_link.data,
-    facebook_link= form.facebook_link.data,
-    website_link= form.website_link.data,
-    seeking_talent= form.seeking_talent.data,
-    seeking_description=form.seeking_description.data
-    )
-    flash('Venue was successfully listed')
-    db.session.add(new_venue)
-    db.session.commit()
-    # on successful db insert, flash success
-  except:
-    # TODO: on unsuccessful db insert, flash an error instead.
-    # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-    db.session.rollback()
-    flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
-  finally:
-    db.session.close()
-    return render_template('pages/home.html')
+    try:
+      new_venue = Venue(
+      name=  form.name.data,
+      city= form.city.data,
+      state= form.state.data,
+      address= form.address.data,
+      phone= form.phone.data,
+      genres= form.genres.data,
+      image_link= form.image_link.data,
+      facebook_link= form.facebook_link.data,
+      website_link= form.website_link.data,
+      seeking_talent= form.seeking_talent.data,
+      seeking_description=form.seeking_description.data
+      )
+      flash('Venue was successfully listed')
+      db.session.add(new_venue)
+      db.session.commit()
+      # on successful db insert, flash success
+    except:
+      # TODO: on unsuccessful db insert, flash an error instead.
+      # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+      db.session.rollback()
+      flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+    finally:
+      db.session.close()
+      return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
@@ -313,26 +313,27 @@ def show_artist(artist_id):
       data["image_link"] = artist_clicked.image_link
       data["past_shows"] = []
       data["upcoming_shows"] = []
-      for show in shows:
-        # db_show_in_millisecond = show.start_time
-        if show.start_time > datetime.now():
-          upcoming_shows = {
+
+      past_shows_query = db.session.query(Show).join(Venue).filter(Show.artist_id == artist_id).filter(Show.start_time < datetime.now()).all()
+      upcoming_shows_query = db.session.query(Show).join(Venue).filter(Show.artist_id == artist_id).filter(Show.start_time > datetime.now()).all()
+      for show in upcoming_shows_query:
+        upcoming_shows = {
             "venue_id": show.artist_id,
             "venue_name": Venue.query.get(show.venue_id).name,
             "venue_image_link": Venue.query.get(show.venue_id).image_link,
             "start_time": str(show.start_time)
           }
-          data["upcoming_shows"].append(upcoming_shows)
-          data["upcoming_shows_count"] = len(data["upcoming_shows"])
-        else:
-          past_shows = {
+        data["upcoming_shows"].append(upcoming_shows)
+        data["upcoming_shows_count"] = len(data["upcoming_shows"])
+      for show in past_shows_query:
+        past_shows = {
             "venue_id": show.artist_id,
             "venue_name": Venue.query.get(show.venue_id).name,
             "venue_image_link": Venue.query.get(show.venue_id).image_link,
             "start_time": str(show.start_time)
           }
-          data["past_shows"].append(past_shows)
-          data["past_shows_count"] = len(data["past_shows"])
+        data["past_shows"].append(past_shows)
+        data["past_shows_count"] = len(data["past_shows"])
   except:
     flash("Something went wrong..please retry")
   finally:
