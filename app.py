@@ -66,7 +66,6 @@ def venues():
   name_dict = set()
   for venue in venues:
     name_dict.add((venue.city, venue.state))
-    print(name_dict)
   for x in name_dict:
     new_dict = {
       "city": x[0],
@@ -76,7 +75,6 @@ def venues():
     data.append(new_dict)
   for venue in venues:
     for venue_list in data:
-      print(venue_list)
       if venue_list['city'] == venue.city:
         venues_complete_data = {
           "id": venue.id,
