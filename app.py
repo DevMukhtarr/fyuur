@@ -19,9 +19,8 @@ from forms import *
 from flask_migrate import Migrate
 from sqlalchemy import distinct, true
 from sqlalchemy.orm import load_only
-import sys 
 from sqlalchemy.sql import text
-from models import Venue, Artist, Show
+from models import db, Venue, Artist, Show
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -30,6 +29,7 @@ app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
+db.init_app(app)
 migrate = Migrate(app, db)
 # TODO: connect to a local postgresql database
 
